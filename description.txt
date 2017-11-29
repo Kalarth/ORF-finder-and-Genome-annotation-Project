@@ -1,0 +1,305 @@
+Chap 4. Project - Alone in the dark…
+Version: 2.0 - Jean-Christophe Taveau
+0. Notes, remarks, advises
+
+    For this bioinformatics project, you have to deposit a light report in PDF format (max 5 pages) + a Python file myProject.py.
+    The report must summarize your development and gives an interpretation of your results.
+    The header of your report must contain: (i) a title, (ii) the group members, and (iii) the e-mail of a student coordinating the report+code upload.
+    No code must be included in the PDF.
+    This project must be done collaboratively meaning that all the members of the group must participate to the writing of Python functions.
+    Feel free to add any kind of extra information (various explanations, schemes, figures, extra statistics, etc.) in your report if you think it can improve your text, results, and/or code.
+
+1. Context
+
+The aim of this project is to annotate a small genome (bacterial or mitochondrial for example) by trying to predict the various genes. This search is based on finding the ORFs.
+In your report, introduce the subject, write a state of the art by listing the main bioinformatics tools (with a short description), and at least answer the following questions:
+
+    What is an ORF?
+    What is the relation between ORF and gene?
+    What are the limits of such an approach?
+    What are the principal tools computing ORFs ? In their documentation, what kind of algorithm are they using?
+    What are the principal parameters used in these tools?
+
+    Before implementing your own tool, it is always a good idea to use such a bioinformatics tool.
+    Try the NCBI ORF Finder - a popular tool - with a test sequence, look at the documentation and modify the various parameters.
+    Explain in your state of the art section, how it works (in a couple of sentences).
+
+2. Material & Methods
+2.1. Material
+
+The sequence will be given by your professor. You can describe in this subsection the source, molecule type, etc.
+2.2. Methods
+
+The library myBio.py to use is the result of the chapter 2 (Section un peu plus loin en python)
+2.2.1. Implementation of Find ORF tool
+
+All the implementation details are described in the Supplementary Information at the end of this chapter. Even though an algorithm is detailed, feel free to implement another one if you think it is more appropriate.
+2.2.3. GenBank parser (only if remaining time!!!)
+
+To compare the results of your tool and the experimental data from the NCBI databank, a GenBank parser must be implemented to extract all the relevant genes information from the studied genome. See the details in the Supplementary Information at the end of this chapter.
+3. Results
+
+    Note: Feel free to add figures, tables to highlight your results.
+
+In this section, describe your results obtained by the following procedures:
+
+    Run your gene prediction program with various thresholds (No threshold, 90bp, 210bp, 300bp, 420bp, for example. If you choose other thresholds, explain why). Indicate for each, the number of found ORFs, their lengths and other parameters - if you want - like the length distribution. Compare the number of ORFs with the number of genes described in the GenBank entry. Which threshold value seems the most accurate? Number of false and true positives?
+
+4. Discussion and Conclusion
+
+In this section, discuss by comparing the different approaches with the experimental entry found in the NCBI databank.
+What can you conclude? Which genes are well (and poorly) predicted? Discuss the influence of the threshold and the quality of your prediction. Is it a good method?
+What are the possible improvements?
+5. Supplementary Information: Implementation
+
+On the one hand, put all the various functions of your project in a new file called myProject.py in the same directory as the myBio.py and the myBioDataSet.py.
+
+    Note 1: It is highly advised to re-use the functions of your module myBio.
+    Note 2: There is only ONE SINGLE copy of file myProject.py by group of students.
+
+    The Python module is composed of two main parts:
+        (i) ORF functions (problems 4.6.1.x)
+        (ii) a GenBank parser (problems 4.6.3.x). (if remaining time)
+
+    Feel free to add other functions if you think it can help your implementation.
+    For each function that you implement, add a docstring following the Google Python guidelines and ADD your first name and name in the long description section.
+
+Here is an example:
+
+def foo(txt,index):
+    """Short description
+
+    Long description of the function (can be optional), this function
+    is written by author_FirstName author_Name (required).
+
+    Args:
+        txt: sequence data as a string.
+        index: value used for the computation of the result.
+
+    Returns:
+        The function foo returns a very complicated value
+        that absolutely nobody can understand.
+    """
+    # My code is below
+
+6.1. ORF
+
+Problem 4.6.1.1: Write a function getGeneticCode(NCBI_ID) taking as argument the NCBI identifier (trans_table). This function returns a dictionary with the same data structure as those of the function myBio.getStandardCode() .
+
+    Note: Only implement the standard and those you are interested in (not the whole collection). Return an error if the NCBI_ID is unknown in your implementation.
+
+Here is an example of test code:
+
+import myBio as bio
+import myProject as proj
+
+standard = bio.getStandardCode()
+myTable  = proj.getGeneticCode(1) # Standard genetic code table
+if standard == myTable:
+    print('OK')
+else:
+    print('KO')
+
+    The NCBI genetic code tables are located at this URL
+
+Problem 4.6.1.2: Write a function findORF(seq, threshold,codeTable) taking as argument (i) a nucleic sequence (ii) the minimum ORF length expressed in base pairs (bp), and (iii) a genetic code table. This function returns a list of ORFs.
+
+    Each ORF is defined by:
+        start position (in bp)
+        stop position (in bp)
+        frame (1, 2, 3, -1, -2, or -3)
+        length (in bp)
+        translated protein sequence between the start and the stop codons
+
+    In your project, remember to use an appropriate genetic code table
+
+    We will use a very simple algorithm (see Note*):
+        Search all the start and stop codons. Keep track of their locations and frames.
+        For each stop codon, find the next one in the same frame.
+            Search at least one start codon between these two stop codons
+            Extract the corresponding sub-sequence between the start and stop codons.
+            Check if the length of the sub-sequence is greater or equal to the threshold value.
+            if Yes then…
+                Translate the extracted sub-sequence from the start codon up to the stop codon.
+                Store all the required information
+        Repeat the operation
+
+        (Note*): If you think you have (or have found) a more interesting algorithm, feel free to describe it and implement it.
+
+    Example of use (as source of inspiration):
+
+import myBio as bio
+import myProject as proj
+
+seq = bio.readFASTA('/my_home/my_project/my_genome.fasta')
+genTable = proj.getGeneticCode(1)
+listORFs = proj.findORF(seq,3 * 90,genTable)
+print(len(listORFs) ) # Number of ORFs
+print(listORFs[0]['start'])
+print(listORFs[0]['stop'])
+print(listORFs[0]['frame']) # 1, 2, 3, -1, -2, or -3
+print(listORFs[0]['length']) # as a tuple expressed in bp
+print(listORFs[0]['protein']) # M.....*
+print(listORFs[1]['start'])
+...
+
+Problem 4.6.1.3: Write a function getLengths(orf_list) taking as argument an ORF list and returning a list of ORF lengths.
+
+import myBio as bio
+import myProject as proj
+
+seq = bio.readFASTA('/my_home/my_project/my_genome.fasta')
+genTable = proj.getGeneticCode(1)
+listORFs = proj.findORF(seq,3 * 90,genTable)
+lengthlist = getLengths(listORFs)
+...
+
+Problem 4.6.1.4: Write a function getLongestORF(orflist) taking as argument an ORF list and returning the longest ORF.
+
+import myBio as bio
+import myProject as proj
+
+seq = bio.readFASTA('/my_home/my_project/my_genome.fasta')
+genTable = proj.getGeneticCode(1)
+listORFs = proj.findORF(seq,3 * 90,genTable)
+orf = getLongestORF(listORFs)
+...
+
+Problem 4.6.1.5: Write a function getTopLongestORF(orflist,value) taking as arguments an ORF list and a percentage value (between 0.0 and 1.0). This function returns a list of the top value% of the longest ORFs.
+For example, 20 ORFs were found with the following lengths: 20, 20, 22, 24, 30, 33, 38, 40, 50, 56, 56, 66, 68, 69, 70, 76, 76, 86, 96, 110. The top 10% of ORFs are those with a length greater or equal to 96.
+
+import myBio as bio
+import myProject as proj
+
+seq = bio.readFASTA('/my_home/my_project/my_genome.fasta')
+genTable = proj.getGeneticCode(1)
+listORFs = proj.findORF(seq,3 * 90,genTable)
+orfs = getTopLongestORF(listORFs,0.25) # 25%
+...
+
+Utility functions
+
+Problem 4.6.2.3: Write the two functions readCSV(filename, separator,data) and writeCSV(filename, separator) taking as arguments a file name and a separator for reading and writing a file in the CSV file format. The third argument of readCSV(..) is an input dictionary. The first row of the CSV file must be the header containing the key names of the dictionary. The return value of writeCSV(..) is an output dictionary.
+
+import myBio as bio
+import myProject as proj
+
+dict = {'id':2,'start':80,'stop':20,'name':'HBB'}
+error  = proj.writeCSV('/my_home/my_project/my_data.csv',';',dict)
+result = proj.readCSV('/my_home/my_project/my_data.csv',';')
+if (dict == result):
+    print('OK')
+else:
+    print('KO')
+...
+
+The file /my_home/my_project/my_data.csv contains:
+
+id;start;stop;name
+2;80;20;"HBB"
+
+    Note: These functions can be convenient to load/save ORFs data produced by other functions. The main advantage of this format is its availability in spreadsheet softwares.
+
+Problem 4.6.2.4: Write a function compare(orflist1,orflist2) taking as arguments two lists of ORFs/genes. This function only returns a list of identical genes between the two sets. Explain in the docstring of this function how do you decide if two genes are identical.
+
+    Note: If you did not find identical genes, try by using less stringent parameters.
+
+6.2. GenBank parser
+
+Problem 4.6.3.1: Write a function readFlatFile(filename) taking as argument a filename, loading the entry in memory and returning a string.
+
+import myBio as bio
+import myBioProject as proj
+
+txt = proj.readFlatFile('/my_home/my_project/genbank_entry.gb')
+print(txt) # ← 'LOCUS       NM_000518 ' ...
+
+Problem 4.6.3.2: Write a function getFeatures(txt) returning a string containing the FEATURES table.
+
+import myBio as bio
+import myBioProject as proj
+
+entry = proj.readFlatFile('/my_home/my_project/genbank_entry.gb')
+features = proj.getFeatures(entry)
+print(features) # '      source          1..626 '...
+
+Problem 4.6.3.3: Write the function getGenes(txt) returning a list of dictionary containing key/value pairs of information located in the subsections gene and CDS of the FEATURES table.
+
+The dictionary must contain the following information about the gene:
+
+    start: start position (in bp)
+    stop: stop position (in bp)
+    frame: frame (1, 2, 3,- 1, -2, or -3)
+    length: gene length (in bp)
+    name: gene name if available. By default, ‘unknown’.
+    protein: translated protein sequence if available. By default, ‘xxx’.
+    product: product name if available. By default, ‘unknown’.
+
+import myBio as bio
+import myBioProject as proj
+
+entry = proj.readFlatFile('/my_home/my_project/genbank_entry.gb')
+features = proj.getFeatures(entry,'gene')
+genes = proj.getGenes(features)
+print(len(genes)) # Number of genes described in the features section
+
+As a reminder, here is a small extract of a Features table. We are only interested in the subsections geneand CDS to get all the gene information.
+
+     source          1..6444091
+                     /organism="Pseudomonas aeruginosa PA96"
+                     /mol_type="genomic DNA"
+                     /strain="PA96"
+                     /db_xref="taxon:1457392"
+     gene            483..2027
+                     /gene="dnaA"
+                     /locus_tag="PA96_0001"
+     CDS             483..2027
+                     /gene="dnaA"
+                     /locus_tag="PA96_0001"
+                     /note="corresponds to Pseudomonas aeruginosa strain PAO1
+                     locus PA0001"
+                     /codon_start=1
+                     /transl_table=11
+                     /product="chromosomal replication initiation protein"
+                     /protein_id="AHW68496.1"
+
+Wrap all the previous functions in a single parser function.
+
+Problem 4.6.3.4: Write a parser readGenBank(filename) taking as argument a filename, parsing the file containing an entry in the GenBank format and returning a dictionary containing all the general + genes information.
+
+    The general information are:
+        description: entry title (genbank descriptor DEFINITION)
+        type: myBio keywords only - dna, rna, or protein
+        data: sequence data only if available otherwise set to ‘xxx’. When the sequence is too large, the entry does not contain data.
+        ID: Identifier (locus)
+        length: sequence length
+        gbtype: molecule type as described in a genbank entry.
+        organism: organism
+        codeTableID: NCBI genetic code table identifier 
+    Each gene is defined by its:
+        start: start position (in bp)
+        stop: stop position (in bp)
+        frame: frame (1, 2, 3,- 1, -2, or -3)
+        length: gene length (in bp)
+        name: gene name if available. By default, ‘unknown’.
+        protein: translated protein sequence if available. By default, ‘xxx’.
+        product: product name if available. By default, ‘unknown’.
+
+import myBio as bio
+import myBioProject as proj
+
+seq = proj.readGenBank('/my_home/my_project/my_genome.gb')
+print(seq['ID'])
+print(seq['length'])
+print(seq['type'])
+print(seq['organism'])
+print(len(seq['genes']) ) # Number of genes
+print(seq['genes'][0]['start'])
+print(seq['genes'][0]['stop'])
+print(seq['genes'][0]['frame']) # 1, 2, 3, -1, -2, or -3
+print(seq['genes'][0]['length']) # expressed in bp
+print(seq['genes'][0]['protein']) # M.....*
+print(seq['genes'][0]['product']) # protein name
+print(seq['genes'][0]['name']) # gene name
+print(seq['genes'][1]['start'])
+...
