@@ -20,3 +20,37 @@ Returns : The function returns a dictionary containing the amino acids coded by 
 def getGeneticCode(transl_table=4):
 """Returns a dictionary with the coding table corresponding to the number"""
     table={}
+
+
+
+
+
+#Functions used to invert the dna strand.
+def brincomp(seq):
+    comp = ""
+    for i in range(len(seq)):
+        if seq[i] == "A":
+            comp = comp + "T"
+        if seq[i] == "C":
+            comp = comp + "G"
+        if seq[i] == "G":
+            comp = comp + "C"
+        if seq[i] == "T":
+            comp = comp + "A"
+    return comp
+
+
+def invert(seq):
+    comp = brincomp (seq)
+    print comp
+    revers=comp[::-1]
+    #revers = ""
+    """
+    for i in range(len(seq)):
+        if i != 0 :
+            revers = revers + comp[-i]
+        if i == 0 :
+    """
+    print revers
+
+    #end of reverse Functions.
