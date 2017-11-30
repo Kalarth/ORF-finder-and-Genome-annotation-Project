@@ -38,9 +38,9 @@ def isDNA(seq):
     flag=""
     for nuc in seq:
         if nuc in ["A","T","G","C","a","t","g","c"]:
-            flag="True"
+            flag=True
         else:
-            flag="False"
+            flag=False
             return flag
     return flag
 
@@ -74,7 +74,6 @@ def isCodonStop (seq,pos):
 def isGene(seq):
     i=0
     ww=False
-
     while i<len(seq):
         w=isCodonStart(seq,i)
         if w==True:
@@ -83,7 +82,26 @@ def isGene(seq):
         if ww==True and x==True:
             return True
         i=i+3
-    return False    
+    return False
+
+
+def isGene3(seq):
+    frame=[]
+    for i in range (len(seq)):
+        w=isCodonStart(seq,i)
+        if w==True:
+            frame.append(i%3)
+            for j in range (i,len(seq)):
+                x=isCodonStop(seq,j)
+                if x==True:
+                    if i%3==frame[]:
+                        return
+    return
+
+seq='TGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
+flag = isGene3(seq) # True
+print flag
+
 
 
 
