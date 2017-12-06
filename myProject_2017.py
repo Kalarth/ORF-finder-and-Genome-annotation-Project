@@ -25,14 +25,14 @@ def dictionaryFromFASTA(txt, moltype='auto'):
     #TODO - The end of line in text corresponds to the character newline '\n'
     #TODO - Extract the data after the first newline up to the end of txt
     #TODO - Remove all the newline characters
-    
+
     seq['description']=txt.split("\n")[1]
     seq['description']=seq['description'].replace('>', '')
     #seq['DB']=
     #seq['AC']=
     #seq['ID']=
     #print (seq['description'])
-   
+
     seq['data'] = ''.join(txt.split("\n")[2:])
     seq['data']=seq['data'].upper()
     #print (seq['data'])
@@ -45,7 +45,7 @@ def dictionaryFromFASTA(txt, moltype='auto'):
             moltype='dna'
         else:
             moltype='protein'
-    
+
     seq['type']=moltype
     """
     return seq
@@ -116,11 +116,12 @@ def brinAntiSens(seq):
 def getCodonsStart(codeTable):
     codonsStart=[]
     table=getGeneticCode(codeTable)
+    """ CE TRUC NE SERT A RIEN
     for n in table.keys():
         acideAmine=table[n]
     matchingAA=acideAmine[0]
     starter=acideAmine[1]
-
+"""
     for n in table.keys():
         if table[n][1]=="M":
             codonsStart.append(n)
@@ -131,17 +132,19 @@ def getCodonsStart(codeTable):
 def getCodonsStop(codeTable):
     codonsStop=[]
     table=getGeneticCode(codeTable)
+    """ CE TRUC NE SERT A RIEN
     for n in table.keys():
         acideAmine=table[n]
     matchingAA=acideAmine[0]
     starter=acideAmine[1]
-
+"""
     for n in table.keys():
         if table[n][1]=="*":
             codonsStop.append(n)
     #print codonsStop
     return codonsStop
 
+""" INUTILE, MA FONCTION FAIS LA MEME EN MIEUX
 
 def oneWord(seq, start, wlen):
     string=""
@@ -152,7 +155,7 @@ def oneWord(seq, start, wlen):
             string=string+seq[i]
     return string
 
-
+"""
 def isCodonStart(seq, pos, codeTable):
     codonsStart=getCodonsStart(codeTable)
     flag=False
@@ -176,6 +179,7 @@ def isCodonStop(seq, pos, codeTable):
 
 
 def parcoursORF(seq, threshold, codeTable, cadreDeLecture):
+
     complementaireSeq=brinAntiSens(seq)
 
     if cadreDeLecture=="1":
@@ -190,7 +194,7 @@ def parcoursORF(seq, threshold, codeTable, cadreDeLecture):
         sequence=complementaireSeq[1:]
     elif cadreDeLecture=="reverse3":
         sequence=complementaireSeq[2:]
-    
+
     cadrePositionsCodonsStart=[]
     cadrePositionsCodonsStop=[]
     for positionCodonStart in range(0, len(sequence), 3):
@@ -260,7 +264,7 @@ def ORFtableToDict(tableauGlobalORF):
 
 
 def findORF(seq,threshold,codeTable):
-    
+
     #-----------------------------------
     #-----Cadre de lecture 1 (ORF1)-----
     #-----------------------------------
@@ -272,14 +276,14 @@ def findORF(seq,threshold,codeTable):
     #-----Cadre de lecture 2 (ORF2)-----
     #-----------------------------------
     print "Finding genes in ORF2"
-    tableauORF2=parcoursORF(seq, threshold, codeTable, "2")   
+    tableauORF2=parcoursORF(seq, threshold, codeTable, "2")
     listORFs_2=ORFtableToDict(tableauORF2)
     print listORFs_2
     #-----------------------------------
     #-----Cadre de lecture 3 (ORF3)-----
     #-----------------------------------
-    print "Finding genes in ORF3"     
-    tableauORF3=parcoursORF(seq, threshold, codeTable, "3") 
+    print "Finding genes in ORF3"
+    tableauORF3=parcoursORF(seq, threshold, codeTable, "3")
     listORFs_3=ORFtableToDict(tableauORF3)
     print listORFs_3
     #--------------------------------------------
@@ -299,7 +303,7 @@ def findORF(seq,threshold,codeTable):
     #--------------------------------------------
     #-----Cadre de lecture Reverse 3 (ORF-3)-----
     #--------------------------------------------
-    print "Finding genes in ORF reverse3"     
+    print "Finding genes in ORF reverse3"
     tableauORFReverse3=parcoursORF(seq, threshold, codeTable, "reverse3")
     listORFs_reverse3=ORFtableToDict(tableauORFReverse3)
     print listORFs_reverse3
@@ -338,7 +342,7 @@ def writeCSV(filename, separator, data):
 def readCSV(filename, separator):
     '''Marc MONGY'''
     '''Cette fonction effectue la conversion du format CSV vers un dictionnaire (opération inverse de writeCSV) afin de permettre l'utilisation de l'ORF sous forme de dictionnaire Python par d'autres scripts. '''
-    with open ("my_data.csv", "r") as my_data:  
+    with open ("my_data.csv", "r") as my_data:
         result=my_data.read()
         separator=str(separator)
         result=result.replace("'","")

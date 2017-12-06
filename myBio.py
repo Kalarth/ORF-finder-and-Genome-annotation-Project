@@ -6,33 +6,41 @@ Args : None
 Returns : The function returns a dictionary containing the amino acids coded by each codons (codons are used as keys.)
 """
 
-    table={}
+    codetable={}
     base1="TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
     base2="TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG"
     base3="TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
     AAs="FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
+    Start="---M------**--*----M---------------M----------------------------"
 
     for i in range(0,len(AAs)):
         codon=base1[i]+base2[i]+base3[i]
         aa=AAs[i]
-        table[codon]=aa
-    return table
+        starter=Start[i]
+        codetable[codon][0]=aa
+        codetable[codon][1]=starter
 
-def getGeneticCode(transl_table=4):
+    return codetable
+
+def getGeneticCode(transl_table):
 """Returns a dictionary with the coding table corresponding to the number"""
-    table={}
+    codetable={}
 
     if transl_table==4:
         base1="TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
         base2="TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG"
         base3="TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
         AAs="FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
+        Start="--MM------**-------M------------MMMM---------------M------------"
 
     for i in range(0,len(AAs)):
         codon=base1[i]+base2[i]+base3[i]
         aa=AAs[i]
-        table[codon]=aa
-    return table
+        starter=Start[i]
+        codetable[codon][0]=aa
+        codetable[codon][1]=starter
+
+    return codetable
 
 def isDNA(seq):
     flag=""
@@ -57,19 +65,21 @@ def countWord(seq,word):
             cpt=cpt+1
     return cpt
 
-def isCodonStart (seq,pos):
+def isCodonStart (seq,pos,codetable):
+    flag=False
     w=oneWord(seq,pos,3)
-    if w == "ATG" or w =="atg":
-        return True
-    else:
-        return False
+    for codon in codeTable.keys:
+        if w==codon and codetable[codon]=="M":
+            flag=True
+    return flag
 
 def isCodonStop (seq,pos):
+    flag=False
     w=oneWord(seq,pos,3)
-    if w in ["TAA","taa","TAG","tag","TGA","tga"]:
-        return True
-    else:
-        return False
+    for codon in codeTable.keys:
+        if w==codon and codetable[codon]=="*":
+            flag=True
+    return flag
 
 def isGene(seq):
     i=0

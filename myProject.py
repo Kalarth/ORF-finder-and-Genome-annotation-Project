@@ -1,10 +1,62 @@
 import myBio as bio
 
-def translate(seq,codeTable) :
+def loadFASTA(nomFichier):
+    rawFASTA=""
+    fichier=open(nomFichier, "r")
+    for ligne in fichier.readlines():
+        if not ligne:
+            break
+        else:
+            rawFASTA=rawFASTA+ligne
+    fichier.close()
+    return rawFASTA
+
+
+def dictionaryFromFASTA(txt, moltype='auto'):
+    '''Return a dictionary separating the header from the data'''
+    #Init dictionary
+    seq = {'description':'myBio sequence','data':'None','type':'auto','DB':'db','AC':'ac','ID':'id'}
+    #TODO - Extract the header from the 2nd character to the end of line
+    #TODO - The end of line in text corresponds to the character newline '\n'
+    #TODO - Extract the data after the first newline up to the end of txt
+    #TODO - Remove all the newline characters
+
+    seq['description']=txt.split("\n")[1]
+    seq['description']=seq['description'].replace('>', '')
+    #seq['DB']=
+    #seq['AC']=
+    #seq['ID']=
+    #print (seq['description'])
+
+    seq['data'] = ''.join(txt.split("\n")[2:])
+    seq['data']=seq['data'].upper()
+    #print (seq['data'])
+    """
+    #Tout ce merdier est un reliquat de l'année dernière qui identifiait automatiquement le type de séquence. Ici, il gène plus qu'autre chose.
+    if moltype=='auto':
+        if isRNA(seq):
+            moltype='rna'
+        elif isDNA(seq):
+            moltype='dna'
+        else:
+            moltype='protein'
+
+    seq['type']=moltype
+    """
+    return seq
+
+
+def readFASTA(txt): #récupère la séquence en String dans le dico
+    sequence=dictionaryFromFASTA(txt, moltype='auto')
+    seqString=sequence['data']
+    return seqString
+
+
+def translate(seq,codetable) :
     """
     This function translate a Dna sequence into a proteic sequence.
     Arg : seq - the gene sequence
-          codeTable - the genetic code associated with the species.
+          codetable - the genetic code associated with the species.
     Returns : The proteic sequence as a string.
     """
     seqprot=""
@@ -12,14 +64,14 @@ def translate(seq,codeTable) :
     if flag==True:
         for i in range(len(seq)):
             codon=bio.oneWord(seq,i,3)
-            for tablecodon in table.keys:
+            for tablecodon in codetable.keys:
                 if codon==tablecodon:
-                    seqprot=seqprot+table[tablecodon]
+                    seqprot=seqprot+codetable[tablecodon][0]
         return seqprot
     else:
         return "error, sequence is not dna."
 
-def findORF (seq,threshold,codeTable):
+def findORF (seq,threshold,codetable):
     """
     This function return a list of ORFs in the form of a dictionary.
     Author : Thomas Blanc
@@ -34,13 +86,13 @@ def findORF (seq,threshold,codeTable):
 
 #Research of all the start and stop codons in the 3 frames.
     for i in len(seq):
-        strt=bio.isCodonStart(seq,i)
+        strt=bio.isCodonStart(seq,i,codetable)
         if strt==True:
             frame=i%3
             pos=i
             startdic[i]=frame
 
-        stp=bio.isCodonStop(seq,i)
+        stp=bio.isCodonStop(seq,i,codetable)
         if stp==True:
             frame=i%3
             pos=i
@@ -82,7 +134,7 @@ for i in range(len(stopposlist):
 
                     if len(extractseq)>threshold:
                         #translate
-                        protein=translate(extractseq,codeTable)
+                        protein=translate(extractseq,codetable)
 
 
                         #store all the useful data in lists
@@ -130,9 +182,7 @@ def getLongestORF(orf_list):
     """
     max=0
     for i in range (len(orf_list)):
-        if(orf_list[i]>max):topValue = getTopLongestORF(orflist,value)
-print topValue
-
+        if(orf_list[i]>max):
             max=orf_list[i]
 
     return max
@@ -161,3 +211,85 @@ def getTopLongestORF(orf_list,percentage):
                     break
 
     return topValue
+
+
+
+def compare(ORFs1,ORFs2):
+    """Short description
+
+        is written by Ludwig DUVAL
+
+    Args:
+        orfliste1:
+        orfliste2:
+    Returns:
+        la fonction compare retourne une liste contenant les orf produisant les meme
+        proteine
+    """
+    listgeneidentique = []
+
+    for i in ORFs1.keys:
+        for j in ORFs2.keys:
+            if ORFs1[i][4] == orf2[j][4] :
+                listgeneidentique.append([i, ORFs1[i][4], j, orf2[j][4])
+    return listgeneidentique
+
+
+
+def writeCSV(filename, separator, data):
+    '''Marc MONGY'''
+    '''Cette fonction utilise une série de fonctions de manipulation de listes, de chaînes de caractères et de dictionnaires pour convertir l'ORF (sous forme de dictionnaire Python) et l'enregistrer sous un format de fichier CSV. Le paramètre "separator" représente le séparateur utilisé (ici, le point-virgule)'''
+    keys=list(data.keys())
+    values=list(data.values())
+    result=readCSV(filename, separator)
+    with open ("my_data.csv", "w") as my_data:
+        separator=str(separator)
+        keys=str(keys)
+        keys=keys.replace(",", separator)
+        keys=keys.replace("'", "")
+        keys=keys.replace(" ","")
+        keys=keys.replace("[","")
+        keys=keys.replace("]","")
+        values=str(values)
+        values=values.replace(',', separator)
+        values=values.replace(" ","")
+        values=values.replace("[","")
+        values=values.replace("]","")
+        error=my_data.write(keys)
+        error=my_data.write(str('\n'))
+        error=my_data.write(values)
+        my_data.close()
+    return error
+
+
+
+def readCSV(filename, separator):
+    '''Marc MONGY'''
+    '''Cette fonction effectue la conversion du format CSV vers un dictionnaire (opération inverse de writeCSV) afin de permettre l'utilisation de l'ORF sous forme de dictionnaire Python par d'autres scripts. '''
+    with open ("my_data.csv", "r") as my_data:
+        result=my_data.read()
+        separator=str(separator)
+        result=result.replace("'","")
+        result=result.replace(separator, "', '")
+        result="['" + result + "']"
+        result=result.replace("\n", "']\n['")
+        result=result.split('\n')
+        result[0]=result[0].replace("'", "")
+        result[0]=result[0].replace("[", "")
+        result[0]=result[0].replace("]", "")
+        result[0]=result[0].replace(" ","")
+        result[0]=result[0].split(',')
+        keys=result[0]
+        result[1]=result[1].replace("'", "")
+        result[1]=result[1].replace("[", "")
+        result[1]=result[1].replace("]", "")
+        result[1]=result[1].replace(" ","")
+        result[1]=result[1].split(',')
+        values=result[1]
+        result={key:value for key, value in zip(keys,values)}
+        result['id']=int(result['id'])
+        result['start']=int(result['start'])
+        result['stop']=int(result['stop'])
+        result['name']=str(result['name'])
+        my_data.close()
+    return result

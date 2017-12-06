@@ -1,7 +1,7 @@
 
 
 
-def compare(orfliste1,orfliste2):
+def compare(ORFs1,ORFs2):
     """Short description
 
         is written by Ludwig DUVAL
@@ -14,12 +14,9 @@ def compare(orfliste1,orfliste2):
         proteine
     """
     listgeneidentique = []
-    listProteine1 = translate(orfliste1)
-    listProteine2 = translate(orfliste2)
-    for i in range(len(listProteine1)):
-        for j in range(len(listProteine2)):
-            orf1 = oneWord(listProteine1[i],0,len(listProteine1[i]))
-            orf2 = oneWord(listProteine2[j],0,len(listProteine2[j]))
-            if orf1 == orf2 :
-                listgeneidentique.append([i,listProteine1[i],j,listProteine2[j]])
+
+    for i in ORFs1.keys:
+        for j in ORFs2.keys:
+            if ORFs1[i][4] == orf2[j][4] :
+                listgeneidentique.append([i, ORFs1[i][4], j, orf2[j][4])
     return listgeneidentique
