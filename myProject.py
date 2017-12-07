@@ -107,7 +107,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
 
 
-    print stopposlist
+    #print stopposlist
     ORFs={}
     finalstartpos=[]
     finalstoppos=[]
@@ -124,40 +124,41 @@ def findORF (seq,threshold,codetable,orflist,sens):
             """
     while i <= (len(stopposlist)-1):
         j=i+1
-        print i
-        print j
+        #print i
+        #print j
+        x=0
         while x == 0:
+
             if j > len(stopframelist):
                 x=1
+            if j <= len(stopframelist):
+                if stopframelist[i]==stopframelist[j]:
+                    for k in range (len(startposlist)):
+                     if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
+                            #extract sequence
+                            extractseq=seq[startposlist[k]:stopposlist[j]]
+                            #print "Sequence extraite: ",extractseq
 
-            if stopframelist[i]==stopframelist[j]:
-
-
-                for k in range (len(startposlist)):
-
-                 if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
-                        #extract sequence
-                        extractseq=seq[startposlist[k]:stopposlist[j]]
-                        print "Sequence extraite: ",extractseq
-
-                        if len(extractseq)>threshold:
-                            #translate
-                            protein=translate(extractseq,codetable)
-                            print "Traduction: ",protein
+                            if len(extractseq)>threshold:
+                                #translate
+                                protein=translate(extractseq,codetable)
+                                #print "Traduction: ",protein
 
 
-                            #store all the useful data in lists
-                            finalstartpos.append(startposlist[k])
-                            finalstoppos.append(stopposlist[j])
-                            finalframe.append(stopframelist[i])
-                            finallength.append(len(extractseq))
-                            finaltranslation.append(protein)
-                            cpt=cpt+1
+                                #store all the useful data in lists
+                                finalstartpos.append(startposlist[k])
+                                finalstoppos.append(stopposlist[j])
+                                finalframe.append(stopframelist[i])
+                                finallength.append(len(extractseq))
+                                finaltranslation.append(protein)
+                                cpt=cpt+1
+                                print "ORF +1"
 
-                            print cpt
-                            x=1
+                                #print cpt
+                                x=1
 
             j=j+1
+            print i
         i=i+1
 
     orflist.append(finalstartpos)
@@ -172,12 +173,16 @@ def ORFtableToDict(tableauGlobalORF):
     ORFs={}
     startposition=orflist[0]
     startposition.extend(orflist[5])
+
     stopposition=orflist[1]
     stopposition.extend(orflist[6])
+
     cadre=orflist[2]
     cadre.extend(orflist[7])
+
     longueur=orflist[3]
     longueur.extend(orflist[8])
+
     traduction=orflist[4]
     traduction.extend(orflist[9])
 
@@ -341,17 +346,19 @@ def readCSV(filename, separator):
 
 #Begin
 orflist=[]
-"""
+
 rawFASTA=loadFASTA("my_genome.fasta")
 seq=readFASTA(rawFASTA)
-"""
-seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
+
+print len(seq)
+
+#seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
 
 invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=0
+threshold=600
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
@@ -361,6 +368,8 @@ findORF(invert_seq, threshold, CodeTable, orflist, 1)
 
 ORFs_FINAL_List=ORFtableToDict(orflist)
 
+for i in range (len(ORFs_FINAL_List)):
+    print ORFs_FINAL_List[i]
 
 
 print len(ORFs_FINAL_List)
