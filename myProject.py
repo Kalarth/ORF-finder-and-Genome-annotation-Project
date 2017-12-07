@@ -39,6 +39,7 @@ def dictionaryFromFASTA(txt, moltype='auto'):
 def readFASTA(txt): #Get the DNA sequence from the dictionary into a string
     sequence=dictionaryFromFASTA(txt, moltype='auto')
     seqString=sequence['data']
+    print "FASTA OK"
     return seqString
 
 
@@ -89,6 +90,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
                 frame=-frame
             startframelist.append(frame)
             startposlist.append(i)
+            print "Cadre: ",frame," , "," Position codon start: ",i
 
         stp=bio.isCodonStop(seq,i,codetable)
         if stp==True:
@@ -98,7 +100,8 @@ def findORF (seq,threshold,codetable,orflist,sens):
             pos=i
             stopframelist.append(frame)
             stopposlist.append(i)
-
+            print "Cadre: ",frame," , "," Position codon stop: ",i
+    print "CODONS OK"
     #dico[cle][3]
 
 
@@ -118,16 +121,19 @@ def findORF (seq,threshold,codetable,orflist,sens):
         for j in range (i+1,len(stopposlist)):
 
             if stopframelist[i]==stopframelist[j]:
+                
 
                 for k in range (len(startposlist)):
 
                     if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
                         #extract sequence
                         extractseq=seq[startposlist[k]:stopposlist[j]]
+                        print "Sequence extraite: ",extractseq
 
                         if len(extractseq)>threshold:
                             #translate
                             protein=translate(extractseq,codetable)
+                            print "Traduction: ",protein
 
 
                             #store all the useful data in lists
@@ -137,7 +143,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
                             finallength.append(len(extractseq))
                             finaltranslation.append(protein)
                             cpt=cpt+1
-                            #print cpt
+                            print cpt
     orflist.append(finalstartpos)
     orflist.append(finalstoppos)
     orflist.append(finalframe)
@@ -327,7 +333,7 @@ invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=0
+threshold=2300
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
