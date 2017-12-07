@@ -122,17 +122,17 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
         for j in range (i+1,len(stopposlist)):
             """
-    while i <= len(stopposlist):
-        try:
-            j=i+1
-        except :
-            break
-
-
+    for i in range (len(stopposlist)):
+    #while i < len(stopposlist):
+        j=i+1
         #print i
         #print j
-        x=0
-        while x == 0:
+        
+        if i==len(stopposlist):
+            x=2
+        else:
+            x=0
+        while x == 0 and x!=2:
 
             if j > len(stopframelist):
                 x=1
@@ -168,10 +168,11 @@ def findORF (seq,threshold,codetable,orflist,sens):
                                 #print cpt
 
                 j=j+1
+                print x
 
 
-            #print i
-        i=i+1
+                #print i
+        #i=i+1
     print "LISTE BEGIN"
     orflist.append(finalstartpos)
     print "LISTE 1"
@@ -378,7 +379,7 @@ invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=600
+threshold=2500
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
