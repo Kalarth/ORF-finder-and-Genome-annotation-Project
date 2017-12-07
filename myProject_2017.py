@@ -144,7 +144,7 @@ def getCodonsStop(codeTable):
     #print codonsStop
     return codonsStop
 
-""" INUTILE, MA FONCTION FAIS LA MEME EN MIEUX
+"""
 
 def oneWord(seq, start, wlen):
     string=""

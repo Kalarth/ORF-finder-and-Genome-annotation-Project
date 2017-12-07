@@ -1,3 +1,4 @@
+
 import myBio as bio
 
 def loadFASTA(nomFichier):
@@ -31,22 +32,11 @@ def dictionaryFromFASTA(txt, moltype='auto'):
     seq['data'] = ''.join(txt.split("\n")[2:])
     seq['data']=seq['data'].upper()
     #print (seq['data'])
-    """
-    #Tout ce merdier est un reliquat de l'année dernière qui identifiait automatiquement le type de séquence. Ici, il gène plus qu'autre chose.
-    if moltype=='auto':
-        if isRNA(seq):
-            moltype='rna'
-        elif isDNA(seq):
-            moltype='dna'
-        else:
-            moltype='protein'
 
-    seq['type']=moltype
-    """
     return seq
 
 
-def readFASTA(txt): #récupère la séquence en String dans le dico
+def readFASTA(txt): #Get the DNA sequence from the dictionary into a string
     sequence=dictionaryFromFASTA(txt, moltype='auto')
     seqString=sequence['data']
     return seqString
@@ -55,6 +45,7 @@ def readFASTA(txt): #récupère la séquence en String dans le dico
 def translate(seq,codetable) :
     """
     This function translate a Dna sequence into a proteic sequence.
+    Author : Thomas Blanc
     Arg : seq - the gene sequence
           codetable - the genetic code associated with the species.
     Returns : The proteic sequence as a string.
@@ -64,14 +55,14 @@ def translate(seq,codetable) :
     if flag==True:
         for i in range(len(seq)):
             codon=bio.oneWord(seq,i,3)
-            for tablecodon in codetable.keys:
+            for tablecodon in codetable.keys():
                 if codon==tablecodon:
                     seqprot=seqprot+codetable[tablecodon][0]
         return seqprot
     else:
         return "error, sequence is not dna."
 
-def findORF (seq,threshold,codetable):
+def findORF (seq,threshold,codetable,orflist,sens):
     """
     This function return a list of ORFs in the form of a dictionary.
     Author : Thomas Blanc
@@ -81,77 +72,106 @@ def findORF (seq,threshold,codetable):
     Returns : A dictionary containing a list of information for each ORFs,
     namely their start and stop positions, their reading frames, their length ad the translated protein sequence.
     """
-    startdic={}
-    stopdic={}
+
 
 #Research of all the start and stop codons in the 3 frames.
-    for i in len(seq):
+    #print seq
+    startframelist=[]
+    startposlist=[]
+    stopframelist=[]
+    stopposlist=[]
+    #print len(seq)
+    for i in range(len(seq)):
         strt=bio.isCodonStart(seq,i,codetable)
         if strt==True:
-            frame=i%3
-            pos=i
-            startdic[i]=frame
+            frame=(i%3)+1
+            if sens == 1:
+                frame=-frame
+            startframelist.append(frame)
+            startposlist.append(i)
 
         stp=bio.isCodonStop(seq,i,codetable)
         if stp==True:
-            frame=i%3
+            frame=(i%3)+1
+            if sens == 1:
+                frame=-frame
             pos=i
-            stopdic[pos]=frame
+            stopframelist.append(frame)
+            stopposlist.append(i)
 
-#dico[clé][3]
-startframelist=[]
-startposlist=[]
-stopframelist=[]
-stopposlist=[]
-
-for i in startdic.keys:
-    startframelist.append(stopdic[i])
-    startposlist.append(i)
+    #dico[cle][3]
 
 
 
-for i in stopdic.keys:
-    stopframelist.append(stopdic[i])
-    stopposlist.append(i)
 
- position (in bp)
-stop po
-ORFs={}
-finalstartpos=[]
-finalstoppos=[]
-finalframe=[]
-finallength=[]
-finaltranslation=[]
-cpt=0
-for i in range(len(stopposlist):
-    for j in range (i+1,len(poslist)):
-        if stopframelist[i]==stopframelist[j]:
+     #position (in bp)
+    #stop po
+    ORFs={}
+    finalstartpos=[]
+    finalstoppos=[]
+    finalframe=[]
+    finallength=[]
+    finaltranslation=[]
+    cpt=0
+    for i in range (len(stopposlist)):
 
-            for k in range (len(startposlist)):
-                if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
-                    #extract sequence
-                    extractseq=seq[startposlist[k]:stopposlist[j]]
+        for j in range (i+1,len(stopposlist)):
 
-                    if len(extractseq)>threshold:
-                        #translate
-                        protein=translate(extractseq,codetable)
+            if stopframelist[i]==stopframelist[j]:
 
+                for k in range (len(startposlist)):
 
-                        #store all the useful data in lists
-                        finalstartpos.append(startposlist[k])
-                        finalstoppos.append(stopposlist[j])
-                        finalframe.append(stopframelist[i])
-                        finallength.append(len(extractseq))
-                        finaltranslation.append(protein)
-                        cpt=cpt+1
+                    if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
+                        #extract sequence
+                        extractseq=seq[startposlist[k]:stopposlist[j]]
 
-#store data from the lists into a dictionary
-    for orf in range (0,cpt):
-        ORFs[orf]=[finalstartpos[orf],finalstoppos[orf],finalframe[orf],finallength[orf],finaltranslation[orf]]
-    return ORFs
+                        if len(extractseq)>threshold:
+                            #translate
+                            protein=translate(extractseq,codetable)
 
 
-def getLengths(ORFs):
+                            #store all the useful data in lists
+                            finalstartpos.append(startposlist[k])
+                            finalstoppos.append(stopposlist[j])
+                            finalframe.append(stopframelist[i])
+                            finallength.append(len(extractseq))
+                            finaltranslation.append(protein)
+                            cpt=cpt+1
+                            #print cpt
+    orflist.append(finalstartpos)
+    orflist.append(finalstoppos)
+    orflist.append(finalframe)
+    orflist.append(finallength)
+    orflist.append(finaltranslation)
+    #print orflist
+    return orflist
+
+def ORFtableToDict(tableauGlobalORF):
+    ORFs={}
+    startposition=orflist[0]
+    startposition.extend(orflist[5])
+    stopposition=orflist[1]
+    stopposition.extend(orflist[6])
+    cadre=orflist[2]
+    cadre.extend(orflist[7])
+    longueur=orflist[3]
+    longueur.extend(orflist[8])
+    traduction=orflist[4]
+    traduction.extend(orflist[9])
+
+    """
+    for n in range(len(startposition)):
+        ORFs[n]=[startposition[n], stopposition[n], cadre[n], longueur[n], traduction[n]]
+    """
+    listORFs=[]
+    for n in range(len(startposition)):
+        dictORF={'start':startposition[n], 'stop':stopposition[n], 'frame':cadre[n], 'length':longueur[n], 'sequence_prot':traduction[n]}
+        listORFs.append(dictORF)
+    return listORFs
+
+
+
+def getLengths(listORFs):
     """Short description : From an ORF list return a list of ORF lengths
 
     this function is written by Michele RAFFAELLI .
@@ -164,28 +184,25 @@ def getLengths(ORFs):
     """
 
     orf_list=[]
-    for i in ORFs.keys:
-        orf_list.extend(ORFs[i][3])
+    for i in range(len(listORFs)):
+        orf_list.extend(ORFs[i]['length'])
 
     return orf_list
 
 def getLongestORF(orf_list):
-     """Short description : From an list of  ORF length return the longest ORF
-
+    """
+    Short description : From an list of  ORF length return the longest ORF
     this function is written by Michele RAFFAELLI .
-
     Args:
-        orf_list: list of orf lengths returned by the function getLengths()
-
+       orf_list: list of orf lengths returned by the function getLengths()
     Returns:
         The function getLongestORF returns the longest ORF
-    """
-    max=0
+   """
+    maxi=0
     for i in range (len(orf_list)):
-        if(orf_list[i]>max):
-            max=orf_list[i]
-
-    return max
+        if(orf_list[i]>maxi):
+            maxi=orf_list[i]
+    return maxi
 
 
 
@@ -214,7 +231,7 @@ def getTopLongestORF(orf_list,percentage):
 
 
 
-def compare(ORFs1,ORFs2):
+def compare(listORFs1,listORFs2):
     """Short description
 
         is written by Ludwig DUVAL
@@ -228,17 +245,21 @@ def compare(ORFs1,ORFs2):
     """
     listgeneidentique = []
 
-    for i in ORFs1.keys:
-        for j in ORFs2.keys:
-            if ORFs1[i][4] == orf2[j][4] :
-                listgeneidentique.append([i, ORFs1[i][4], j, orf2[j][4])
+    for i in range(len(listORFs1)):
+        for j in range(len(listORFs_2)):
+            if ORFs1[i]['sequence_prot'] == orf2[j]['sequence_prot'] :
+                listgeneidentique.append([i, ORFs1[i]['sequence_prot'], j, orf2[j]['sequence_prot']])
     return listgeneidentique
 
 
 
 def writeCSV(filename, separator, data):
     '''Marc MONGY'''
-    '''Cette fonction utilise une série de fonctions de manipulation de listes, de chaînes de caractères et de dictionnaires pour convertir l'ORF (sous forme de dictionnaire Python) et l'enregistrer sous un format de fichier CSV. Le paramètre "separator" représente le séparateur utilisé (ici, le point-virgule)'''
+    '''Cette fonction utilise une serie de fonctions de manipulation de listes,
+    de chaines de caracteres et de dictionnaires pour convertir l'ORF (sous forme de dictionnaire Python)
+    et l'enregistrer sous un format de fichier CSV.
+    Le parametre "separator" represente le separateur utilise (ici, le point-virgule)
+    '''
     keys=list(data.keys())
     values=list(data.values())
     result=readCSV(filename, separator)
@@ -264,8 +285,10 @@ def writeCSV(filename, separator, data):
 
 
 def readCSV(filename, separator):
-    '''Marc MONGY'''
-    '''Cette fonction effectue la conversion du format CSV vers un dictionnaire (opération inverse de writeCSV) afin de permettre l'utilisation de l'ORF sous forme de dictionnaire Python par d'autres scripts. '''
+    """Marc MONGY"""
+    """Cette fonction effectue la conversion du format CSV vers un dictionnaire (operation inverse de writeCSV)
+    afin de permettre l'utilisation de l'ORF sous forme de dictionnaire Python par d'autres scripts.
+    """
     with open ("my_data.csv", "r") as my_data:
         result=my_data.read()
         separator=str(separator)
@@ -293,3 +316,25 @@ def readCSV(filename, separator):
         result['name']=str(result['name'])
         my_data.close()
     return result
+
+#Begin
+orflist=[]
+rawFASTA=loadFASTA("my_genome.fasta")
+seq=readFASTA(rawFASTA)
+#seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
+
+invert_seq=bio.brinAntiSens(seq)
+
+CodeTable=bio.getGeneticCode(4)
+
+threshold=0
+
+findORF(seq, threshold, CodeTable, orflist, 0)
+
+findORF(invert_seq, threshold, CodeTable, orflist, 1)
+
+
+
+ORFs_FINAL_List=ORFtableToDict(orflist)
+
+print len(ORFs_FINAL_List)

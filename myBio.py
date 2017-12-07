@@ -1,10 +1,10 @@
 
 def getStandardCode():
-"""
-This function gives the standard genetic code in the form of a dictionary. Author : Thomas Blanc
-Args : None
-Returns : The function returns a dictionary containing the amino acids coded by each codons (codons are used as keys.)
-"""
+    """
+    This function gives the standard genetic code in the form of a dictionary. Author : Thomas Blanc
+    Args : None
+    Returns : The function returns a dictionary containing the amino acids coded by each codons (codons are used as keys.)
+    """
 
     codetable={}
     base1="TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
@@ -23,7 +23,7 @@ Returns : The function returns a dictionary containing the amino acids coded by 
     return codetable
 
 def getGeneticCode(transl_table):
-"""Returns a dictionary with the coding table corresponding to the number"""
+    """Returns a dictionary with the coding table corresponding to the number"""
     codetable={}
 
     if transl_table==4:
@@ -37,8 +37,8 @@ def getGeneticCode(transl_table):
         codon=base1[i]+base2[i]+base3[i]
         aa=AAs[i]
         starter=Start[i]
-        codetable[codon][0]=aa
-        codetable[codon][1]=starter
+        codetable[codon]=[aa, starter]
+
 
     return codetable
 
@@ -68,16 +68,16 @@ def countWord(seq,word):
 def isCodonStart (seq,pos,codetable):
     flag=False
     w=oneWord(seq,pos,3)
-    for codon in codeTable.keys:
-        if w==codon and codetable[codon]=="M":
+    for codon in codetable.keys():
+        if w==codon and codetable[codon][1]=="M":
             flag=True
     return flag
 
-def isCodonStop (seq,pos):
+def isCodonStop (seq,pos,codetable):
     flag=False
     w=oneWord(seq,pos,3)
-    for codon in codeTable.keys:
-        if w==codon and codetable[codon]=="*":
+    for codon in codetable.keys():
+        if w==codon and codetable[codon][1]=="*":
             flag=True
     return flag
 
@@ -94,7 +94,7 @@ def isGene(seq):
         i=i+3
     return False
 
-
+"""
 def isGene3(seq):
     frame=[]
     for i in range (len(seq)):
@@ -107,10 +107,11 @@ def isGene3(seq):
                     if i%3==frame[]:
                         return
     return
+"""
+#seq='TGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
+#flag = isGene3(seq) # True
+#print flag
 
-seq='TGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
-flag = isGene3(seq) # True
-print flag
 
 
 
@@ -131,16 +132,15 @@ def brincomp(seq):
 
 
 def invert(seq):
-    comp = brincomp (seq)
-    print comp
-    revers=comp[::-1]
-    #revers = ""
-    """
-    for i in range(len(seq)):
-        if i != 0 :
-            revers = revers + comp[-i]
-        if i == 0 :
-    """
-    print revers
+    #comp = brincomp (seq)
+    #print comp
+    reverse=seq[::-1]
+    return reverse
+
+def brinAntiSens(seq):
+    brinSens=seq
+    inverseBrinSens=invert(brinSens)
+    complementaire=brincomp(inverseBrinSens)
+    return complementaire
 
     #end of reverse Functions.
