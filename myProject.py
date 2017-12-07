@@ -122,8 +122,13 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
         for j in range (i+1,len(stopposlist)):
             """
-    while i <= (len(stopposlist)-1):
-        j=i+1
+    while i <= len(stopposlist):
+        try:
+            j=i+1
+        except :
+            break
+
+
         #print i
         #print j
         x=0
@@ -131,13 +136,16 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
             if j > len(stopframelist):
                 x=1
-            if j <= len(stopframelist):
+            if j < len(stopframelist) and i < len(stopframelist):
                 if stopframelist[i]==stopframelist[j]:
                     for k in range (len(startposlist)):
                      if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
                             #extract sequence
                             extractseq=seq[startposlist[k]:stopposlist[j]]
                             #print "Sequence extraite: ",extractseq
+                            x=1
+
+
 
                             if len(extractseq)>threshold:
                                 #translate
@@ -152,20 +160,29 @@ def findORF (seq,threshold,codetable,orflist,sens):
                                 finallength.append(len(extractseq))
                                 finaltranslation.append(protein)
                                 cpt=cpt+1
+                                print stopposlist[i]
+                                print startposlist[k]
+                                print stopposlist[j]
                                 print "ORF +1"
 
                                 #print cpt
-                                x=1
 
-            j=j+1
-            print i
+                j=j+1
+
+
+            #print i
         i=i+1
-
+    print "LISTE BEGIN"
     orflist.append(finalstartpos)
+    print "LISTE 1"
     orflist.append(finalstoppos)
+    print "LISTE 2"
     orflist.append(finalframe)
+    print "LISTE 3"
     orflist.append(finallength)
+    print "LISTE 4"
     orflist.append(finaltranslation)
+    print "LISTE OK"
     #print orflist
     return orflist
 
@@ -194,6 +211,7 @@ def ORFtableToDict(tableauGlobalORF):
     for n in range(len(startposition)):
         dictORF={'start':startposition[n], 'stop':stopposition[n], 'frame':cadre[n], 'length':longueur[n], 'sequence_prot':traduction[n]}
         listORFs.append(dictORF)
+        print "DICO"
     return listORFs
 
 
@@ -348,7 +366,9 @@ def readCSV(filename, separator):
 orflist=[]
 
 rawFASTA=loadFASTA("my_genome.fasta")
-seq=readFASTA(rawFASTA)
+seq2=readFASTA(rawFASTA)
+
+seq=seq2[0:50000]
 
 print len(seq)
 
