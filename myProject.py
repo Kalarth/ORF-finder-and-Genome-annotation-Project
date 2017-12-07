@@ -107,8 +107,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
 
 
-     #position (in bp)
-    #stop po
+    print stopposlist
     ORFs={}
     finalstartpos=[]
     finalstoppos=[]
@@ -116,16 +115,27 @@ def findORF (seq,threshold,codetable,orflist,sens):
     finallength=[]
     finaltranslation=[]
     cpt=0
+    i=0
+    x=0
+    """
     for i in range (len(stopposlist)):
 
         for j in range (i+1,len(stopposlist)):
+            """
+    while i <= (len(stopposlist)-1):
+        j=i+1
+        print i
+        print j
+        while x == 0:
+            if j > len(stopframelist):
+                x=1
 
             if stopframelist[i]==stopframelist[j]:
-                
+
 
                 for k in range (len(startposlist)):
 
-                    if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
+                 if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
                         #extract sequence
                         extractseq=seq[startposlist[k]:stopposlist[j]]
                         print "Sequence extraite: ",extractseq
@@ -143,7 +153,13 @@ def findORF (seq,threshold,codetable,orflist,sens):
                             finallength.append(len(extractseq))
                             finaltranslation.append(protein)
                             cpt=cpt+1
+
                             print cpt
+                            x=1
+
+            j=j+1
+        i=i+1
+
     orflist.append(finalstartpos)
     orflist.append(finalstoppos)
     orflist.append(finalframe)
@@ -325,15 +341,17 @@ def readCSV(filename, separator):
 
 #Begin
 orflist=[]
+"""
 rawFASTA=loadFASTA("my_genome.fasta")
 seq=readFASTA(rawFASTA)
-#seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
+"""
+seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
 
 invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=2300
+threshold=0
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
@@ -342,5 +360,7 @@ findORF(invert_seq, threshold, CodeTable, orflist, 1)
 
 
 ORFs_FINAL_List=ORFtableToDict(orflist)
+
+
 
 print len(ORFs_FINAL_List)
