@@ -359,9 +359,9 @@ def readCSV(filename, separator):
 orflist=[]
 
 rawFASTA=loadFASTA("my_genome.fasta")
-seq2=readFASTA(rawFASTA)
+seq=readFASTA(rawFASTA)
 
-seq=seq2[0:50000]
+#seq=seq2[0:50000]
 
 print len(seq)
 

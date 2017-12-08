@@ -286,6 +286,7 @@ def findORF(seq,threshold,codeTable):
     fullListORF=parcoursORF(seq, threshold, codeTable)
     for i in range(len(fullListORF)):
         print fullListORF[i]
+    print len(fullListORF)
 
 
 '''---------------Partie 2 - Stats and utilitary-------------'''
@@ -354,9 +355,9 @@ def readCSV(filename, separator):
 
 rawFASTA=loadFASTA("my_genome.fasta")
 #seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
-seq2=readFASTA(rawFASTA)
+seq=readFASTA(rawFASTA)
 
-seq=seq2[0:50000]
+#seq=seq2[0:50000]
 #threshold=3*90
 #threshold=1
 threshold=3000
