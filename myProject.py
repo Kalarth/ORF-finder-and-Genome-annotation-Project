@@ -63,6 +63,44 @@ def translate(seq,codetable) :
     else:
         return "error, sequence is not dna."
 
+
+def getORF(seq,threshold,codetable,StartTable,StopTable,position,finalstartpos,finalstoppos,finalframe,finallength,finaltranslation):
+
+
+    cpt=0
+
+    for j in StopTable.keys():
+        if StopTable[position]==StopTable[j] and position!=j and position < j:
+            for k in StartTable.keys():
+                if k>position and k<j and StartTable[k]==StopTable[j]:
+                    #extract sequence
+                    extractseq=seq[k:j]
+                    #print "Sequence extraite: ",extractseq
+                    if len(extractseq)>threshold:
+                        #translate
+                        protein=translate(extractseq,codetable)
+                        #print "Traduction: ",protein
+                        #store all the useful data in lists
+                        finalstartpos.append(k)
+                        finalstoppos.append(j)
+                        finalframe.append(StartTable[k])
+                        finallength.append(len(extractseq))
+                        finaltranslation.append(protein)
+                        cpt=cpt+1
+                        print position
+                        print k
+                        print j
+                        print len(extractseq)
+                        print "ORF +1"
+                        print cpt
+
+
+                        #print orflist
+                        return finalstartpos, finalstoppos, finalframe, finallength, finaltranslation
+                    else:
+                        return finalstartpos, finalstoppos, finalframe, finallength, finaltranslation
+
+
 def findORF (seq,threshold,codetable,orflist,sens):
     """
     This function return a list of ORFs in the form of a dictionary.
@@ -77,6 +115,8 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
 #Research of all the start and stop codons in the 3 frames.
     #print seq
+    StartTable={}
+    StopTable={}
     startframelist=[]
     startposlist=[]
     stopframelist=[]
@@ -88,8 +128,11 @@ def findORF (seq,threshold,codetable,orflist,sens):
             frame=(i%3)+1
             if sens == 1:
                 frame=-frame
+            """
             startframelist.append(frame)
-            startposlist.append(i)
+            startpo1slist.append(i)
+            """
+            StartTable[i]=frame
             print "Cadre: ",frame," , "," Position codon start: ",i
 
         stp=bio.isCodonStop(seq,i,codetable)
@@ -98,8 +141,11 @@ def findORF (seq,threshold,codetable,orflist,sens):
             if sens == 1:
                 frame=-frame
             pos=i
+            """
             stopframelist.append(frame)
             stopposlist.append(i)
+            """
+            StopTable[i]=frame
             print "Cadre: ",frame," , "," Position codon stop: ",i
     print "CODONS OK"
     #dico[cle][3]
@@ -115,64 +161,10 @@ def findORF (seq,threshold,codetable,orflist,sens):
     finallength=[]
     finaltranslation=[]
     cpt=0
-    i=0
-    x=0
-    """
-    for i in range (len(stopposlist)):
 
-        for j in range (i+1,len(stopposlist)):
-            """
-    for i in range (len(stopposlist)):
-    #while i < len(stopposlist):
-        j=i+1
-        #print i
-        #print j
-        
-        if i==len(stopposlist):
-            x=2
-        else:
-            x=0
-        while x == 0 and x!=2:
+    for i in StopTable.keys():
+        getORF(seq,threshold,codetable,StartTable,StopTable,i,finalstartpos,finalstoppos,finalframe,finallength,finaltranslation)
 
-            if j > len(stopframelist):
-                x=1
-            if j < len(stopframelist) and i < len(stopframelist):
-                if stopframelist[i]==stopframelist[j]:
-                    for k in range (len(startposlist)):
-                     if startposlist[k]>stopposlist[i] and startposlist[k]<stopposlist[j] and startframelist[k]==stopframelist[i]:
-                            #extract sequence
-                            extractseq=seq[startposlist[k]:stopposlist[j]]
-                            #print "Sequence extraite: ",extractseq
-                            x=1
-
-
-
-                            if len(extractseq)>threshold:
-                                #translate
-                                protein=translate(extractseq,codetable)
-                                #print "Traduction: ",protein
-
-
-                                #store all the useful data in lists
-                                finalstartpos.append(startposlist[k])
-                                finalstoppos.append(stopposlist[j])
-                                finalframe.append(stopframelist[i])
-                                finallength.append(len(extractseq))
-                                finaltranslation.append(protein)
-                                cpt=cpt+1
-                                print stopposlist[i]
-                                print startposlist[k]
-                                print stopposlist[j]
-                                print "ORF +1"
-
-                                #print cpt
-
-                j=j+1
-                print x
-
-
-                #print i
-        #i=i+1
     print "LISTE BEGIN"
     orflist.append(finalstartpos)
     print "LISTE 1"
@@ -184,7 +176,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
     print "LISTE 4"
     orflist.append(finaltranslation)
     print "LISTE OK"
-    #print orflist
+
     return orflist
 
 def ORFtableToDict(tableauGlobalORF):
@@ -379,7 +371,7 @@ invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=2500
+threshold=3000
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 

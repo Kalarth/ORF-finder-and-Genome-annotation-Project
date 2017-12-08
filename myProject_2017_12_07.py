@@ -201,7 +201,7 @@ def defineORF(sequence, numeroCadreORF, listePositionsCodonsStart, listePosition
             numeroCodonStartCadre=numeroCodonStartCadre+1
         numeroCodonStopCadre=numeroCodonStopCadre+1
 
-        
+
     return listORFs
 
 
@@ -221,7 +221,7 @@ def parcoursORF(seq, threshold, codeTable):
     cadreORFreverse2PositionsCodonsStop=[]
     cadreORFreverse3PositionsCodonsStart=[]
     cadreORFreverse3PositionsCodonsStop=[]
-    
+
     for positionCodon in range(0, len(sequence)):
         if positionCodon%3==0:
             if isCodonStart(sequence, positionCodon, codeTable)==True:
@@ -354,7 +354,9 @@ def readCSV(filename, separator):
 
 rawFASTA=loadFASTA("my_genome.fasta")
 #seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
-seq=readFASTA(rawFASTA)
+seq2=readFASTA(rawFASTA)
+
+seq=seq2[0:50000]
 #threshold=3*90
 #threshold=1
 threshold=3000
