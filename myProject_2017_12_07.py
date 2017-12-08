@@ -355,11 +355,11 @@ def readCSV(filename, separator):
 
 rawFASTA=loadFASTA("my_genome.fasta")
 #seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
-seq=readFASTA(rawFASTA)
+seq2=readFASTA(rawFASTA)
 
-#seq=seq2[0:50000]
+seq=seq2[0:50000]
 #threshold=3*90
 #threshold=1
-threshold=3000
+threshold=600
 codeTable=4
 findORF(seq,threshold,codeTable)
