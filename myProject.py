@@ -390,6 +390,52 @@ def readCSV(filename, separator):
         my_data.close()
     return result
 
+
+
+
+
+def menu():
+    orflist=[]
+    print "liste OK"
+    rawFASTA=loadFASTA("SeqTestXV.fasta")
+    #seq=readFASTA(rawFASTA)
+    seq2=readFASTA(rawFASTA)
+
+    seq=seq2[0:50000]
+    print "___________________________________________"
+    print "1 : Recherche des ORF"
+    print "2 : sorir du programme"
+    print "___________________________________________"
+    #try:
+        #choix = input("entez votre choix : ")
+
+    #except :
+    #boolean=True
+    choix = input ("entez votre choix : ")
+    #while boolean == True :
+        #menu()
+    if choix == 1 :
+        invert_seq=bio.brinAntiSens(seq)
+        CodeTable=bio.getGeneticCode(4)
+        threshold=600
+        findORF(seq, threshold, CodeTable, orflist, 0)
+        findORF(invert_seq, threshold, CodeTable, orflist, 1)
+        ORFs_FINAL_List=ORFtableToDict(orflist)
+        for i in range (len(ORFs_FINAL_List)):
+            print ORFs_FINAL_List[i]
+            print len(ORFs_FINAL_List)
+    if choix == 2 :
+        sys.exit
+
+
+
+##############################################################
+#Begin
+orflist=[]
+menu()
+
+
+"""
 #Begin
 
 orflist=[]
@@ -428,7 +474,7 @@ orf_length=getLengths(ORFs_FINAL_List)
 #print orf_length
 
 print getLongestORF(orf_length)
-"""
+
 
 
 print getTopLongestORF(orf_length,0.1)
