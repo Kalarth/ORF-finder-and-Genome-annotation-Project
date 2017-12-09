@@ -186,7 +186,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
 
     return orflist
 
-def ORFtableToDict(tableauGlobalORF):
+def ORFtableToDict(orflist):
     ORFs={}
     startposition=orflist[0]
     startposition.extend(orflist[5])
@@ -230,7 +230,7 @@ def getLengths(listORFs):
 
     orf_list=[]
     for i in range(len(listORFs)):
-        orf_list.extend(ORFs[i]['length'])
+        orf_list.append(listORFs[i]['length'])
 
     return orf_list
 
@@ -367,9 +367,9 @@ def readCSV(filename, separator):
 orflist=[]
 
 rawFASTA=loadFASTA("my_genome.fasta")
-seq2=readFASTA(rawFASTA)
+seq=readFASTA(rawFASTA)
 
-seq=seq2[0:50000]
+#seq=seq2[0:50000]
 
 print len(seq)
 
@@ -395,3 +395,10 @@ for i in range (len(ORFs_FINAL_List)):
 
 
 print len(ORFs_FINAL_List)
+
+orf_length=getLengths(ORFs_FINAL_List)
+print orf_length
+
+print getLongestORF(orf_length)
+
+print getTopLongestORF(orf_length,0.1)
