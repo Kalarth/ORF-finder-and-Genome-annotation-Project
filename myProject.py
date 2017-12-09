@@ -367,9 +367,9 @@ def readCSV(filename, separator):
 orflist=[]
 
 rawFASTA=loadFASTA("my_genome.fasta")
-seq=readFASTA(rawFASTA)
+seq2=readFASTA(rawFASTA)
 
-#seq=seq2[0:50000]
+seq=seq2[0:50000]
 
 print len(seq)
 
@@ -379,7 +379,7 @@ invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=600
+threshold=30
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
