@@ -14,7 +14,9 @@ def loadFASTA(nomFichier):
 
 
 def dictionaryFromFASTA(txt, moltype='auto'):
-    '''Return a dictionary separating the header from the data'''
+    '''Return a dictionary separating the header from the data
+       Author : Marc Mongy
+    '''
     #Init dictionary
     seq = {'description':'myBio sequence','data':'None','type':'auto','DB':'db','AC':'ac','ID':'id'}
     #TODO - Extract the header from the 2nd character to the end of line
@@ -36,7 +38,11 @@ def dictionaryFromFASTA(txt, moltype='auto'):
     return seq
 
 
-def readFASTA(txt): #Get the DNA sequence from the dictionary into a string
+def readFASTA(txt):
+    """
+    Get the DNA sequence from the dictionary into a string
+    Author : Marc Mongy
+    """
     sequence=dictionaryFromFASTA(txt, moltype='auto')
     seqString=sequence['data']
     print "FASTA OK"
@@ -65,6 +71,28 @@ def translate(seq,codetable) :
 
 
 def getORF(seq,threshold,codetable,startposlist,startframelist,stopposlist,stopframelist,position,finalstartpos,finalstoppos,finalframe,finallength,finaltranslation):
+    """
+    This function looks for an ORF for one particular Stop Codon
+    ARgs:seq - the gene sequence
+         threshold - the minimum ORF lsngth expressed in base pairs.
+         codeTable - the genetic code associated with the species.
+         startposlist - the list of positions of each start codon.
+         startframelist - the list of reading frames for each start codon
+         stopposlist - the list of positions of each stop codon.
+         stopframelist - the list of reading frames for each stop codon
+         position - the index of the stop codon used to find the ORF
+         finalstartpos - list containing the start position of each ORF
+         finalstoppos - list containing the stop position of each ORF
+         finalframe - list containing the reading frame of each ORF
+         finallength - list containing the sequence length of each ORF (in nucleotides)
+         finaltranslation - list containing the protein sequence of each ORF
+
+    Returns : finalstartpos - list containing the start position of each ORF
+    finalstoppos - list containing the stop position of each ORF
+    finalframe - list containing the reading frame of each ORF
+    finallength - list containing the sequence length of each ORF (in nucleotides)
+    finaltranslation - list containing the protein sequence of each ORF
+    """
 
 
     cpt=0
@@ -109,7 +137,7 @@ def getORF(seq,threshold,codetable,startposlist,startframelist,stopposlist,stopf
 def findORF (seq,threshold,codetable,orflist,sens):
     """
     This function return a list of ORFs in the form of a dictionary.
-    Author : Thomas Blanc
+    Author : Thomas Blanc and Marc Mongy
     Arg : seq - the gene sequence
           threshold - the minimum ORF lsngth expressed in base pairs.
           codeTable - the genetic code associated with the species.
@@ -367,9 +395,9 @@ def readCSV(filename, separator):
 orflist=[]
 
 rawFASTA=loadFASTA("my_genome.fasta")
-seq2=readFASTA(rawFASTA)
+seq=readFASTA(rawFASTA)
 
-seq=seq2[0:50000]
+
 
 print len(seq)
 
@@ -379,7 +407,7 @@ invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=30
+threshold=210
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
@@ -397,8 +425,11 @@ for i in range (len(ORFs_FINAL_List)):
 print len(ORFs_FINAL_List)
 
 orf_length=getLengths(ORFs_FINAL_List)
-print orf_length
+#print orf_length
 
 print getLongestORF(orf_length)
+"""
+
 
 print getTopLongestORF(orf_length,0.1)
+"""
