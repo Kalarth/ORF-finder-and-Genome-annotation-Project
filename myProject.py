@@ -54,7 +54,7 @@ def translate(seq,codetable) :
     seqprot=""
     flag=bio.isDNA(seq)
     if flag==True:
-        for i in range(len(seq)):
+        for i in range(0,len(seq),3):
             codon=bio.oneWord(seq,i,3)
             for tablecodon in codetable.keys():
                 if codon==tablecodon:
@@ -103,7 +103,7 @@ def getORF(seq,threshold,codetable,startposlist,startframelist,stopposlist,stopf
                             print "trop petit"
                             return finalstartpos, finalstoppos, finalframe, finallength, finaltranslation
 
-            print "trop petit"
+            print "Pas de Start"
             return finalstartpos, finalstoppos, finalframe, finallength, finaltranslation
 
 def findORF (seq,threshold,codetable,orflist,sens):
@@ -363,6 +363,7 @@ def readCSV(filename, separator):
     return result
 
 #Begin
+
 orflist=[]
 
 rawFASTA=loadFASTA("my_genome.fasta")

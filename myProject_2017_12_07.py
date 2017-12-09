@@ -178,7 +178,7 @@ def isCodonStop(seq, pos, codeTable):
 
 def defineORF(sequence, numeroCadreORF, listePositionsCodonsStart, listePositionsCodonsStop):
     listORFs=[]
-    stringORF=""
+    #stringORF=""
     numeroCodonStartCadre=0
     numeroCodonStopCadre=0
     numero=0
@@ -189,15 +189,16 @@ def defineORF(sequence, numeroCadreORF, listePositionsCodonsStart, listePosition
                 #print cadrePositionsCodonsStop[numeroCodonStopCadre]+3
                 tailleSequence=(listePositionsCodonsStop[numeroCodonStopCadre]+3)-(listePositionsCodonsStart[numeroCodonStartCadre])
                 if tailleSequence >= threshold:
+                    stringORF=""
                     n=listePositionsCodonsStart[numeroCodonStartCadre]
                     while n < listePositionsCodonsStop[numeroCodonStopCadre]+3:
                         stringORF=stringORF+sequence[n]
                         n=n+1
-                print stringORF
-                dictORF={'numero':numero, 'start':listePositionsCodonsStart[numeroCodonStartCadre], 'stop':listePositionsCodonsStop[numeroCodonStopCadre], 'frame':numeroCadreORF, 'length':tailleSequence, 'sequence_ADN':stringORF}
-                listORFs.append(dictORF)
-                print "Appending sequence ",numero," , ORF ",numeroCadreORF
-                numero=numero+1
+                    print stringORF
+                    dictORF={'numero':numero, 'start':listePositionsCodonsStart[numeroCodonStartCadre], 'stop':listePositionsCodonsStop[numeroCodonStopCadre], 'frame':numeroCadreORF, 'length':tailleSequence, 'sequence_ADN':stringORF}
+                    listORFs.append(dictORF)
+                    print "Appending sequence ",numero," , ORF ",numeroCadreORF
+                    numero=numero+1
             numeroCodonStartCadre=numeroCodonStartCadre+1
         numeroCodonStopCadre=numeroCodonStopCadre+1
 
@@ -355,9 +356,9 @@ def readCSV(filename, separator):
 
 rawFASTA=loadFASTA("my_genome.fasta")
 #seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
-seq2=readFASTA(rawFASTA)
+seq=readFASTA(rawFASTA)
 
-seq=seq2[0:50000]
+#seq=seq2[0:50000]
 #threshold=3*90
 #threshold=1
 threshold=600
