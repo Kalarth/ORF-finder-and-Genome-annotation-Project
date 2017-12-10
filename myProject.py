@@ -1,6 +1,161 @@
 #-*- coding: utf-8 -*-
+"""
+THIS PROGRAM WAS MADE BY THOMAS BLANC, LUDVIG DUVAL, MICHELLE RAFFAELLI AND MARC MONGY.
+"""
+#import myBio as bio
+"""
+Beginning of myBio library
+"""
+def getStandardCode():
+    """
+    This function gives the standard genetic code in the form of a dictionary. Author : Thomas Blanc
+    Args : None
+    Returns : The function returns a dictionary containing the amino acids coded by each codons (codons are used as keys.)
+    """
 
-import myBio as bio
+    codetable={}
+    base1="TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
+    base2="TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG"
+    base3="TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
+    AAs="FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
+    Start="---M------**--*----M---------------M----------------------------"
+
+    for i in range(0,len(AAs)):
+        codon=base1[i]+base2[i]+base3[i]
+        aa=AAs[i]
+        starter=Start[i]
+        codetable[codon][0]=aa
+        codetable[codon][1]=starter
+
+    return codetable
+
+def getGeneticCode(transl_table):
+    """Returns a dictionary with the coding table corresponding to the number"""
+    codetable={}
+
+    if transl_table==4:
+        base1="TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
+        base2="TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG"
+        base3="TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
+        AAs="FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
+        Start="--MM------**-------M------------MMMM---------------M------------"
+
+    for i in range(0,len(AAs)):
+        codon=base1[i]+base2[i]+base3[i]
+        aa=AAs[i]
+        starter=Start[i]
+        codetable[codon]=[aa, starter]
+
+
+    return codetable
+
+def isDNA(seq):
+    flag=""
+    for nuc in seq:
+        if nuc in ["A","T","G","C","a","t","g","c"]:
+            flag=True
+        else:
+            flag=False
+            return flag
+    return flag
+
+def oneWord(seq,start,wlen):
+    w=seq[start:start+wlen]
+    return w
+
+def countWord(seq,word):
+    cpt=0
+    wlen=len(word)
+    for i in range (len(seq)):
+        v=oneWord(seq,i,wlen)
+        if v==word:
+            cpt=cpt+1
+    return cpt
+
+def isCodonStart (seq,pos,codetable):
+    flag=False
+    w=oneWord(seq,pos,3)
+    for codon in codetable.keys():
+        if w==codon and codetable[codon][1]=="M":
+            flag=True
+    return flag
+
+def isCodonStop (seq,pos,codetable):
+    flag=False
+    w=oneWord(seq,pos,3)
+    for codon in codetable.keys():
+        if w==codon and codetable[codon][1]=="*":
+            flag=True
+    return flag
+
+def isGene(seq):
+    i=0
+    ww=False
+    while i<len(seq):
+        w=isCodonStart(seq,i)
+        if w==True:
+            ww=w
+        x=isCodonStop(seq,i)
+        if ww==True and x==True:
+            return True
+        i=i+3
+    return False
+
+"""
+def isGene3(seq):
+    frame=[]
+    for i in range (len(seq)):
+        w=isCodonStart(seq,i)
+        if w==True:
+            frame.append(i%3)
+            for j in range (i,len(seq)):
+                x=isCodonStop(seq,j)
+                if x==True:
+                    if i%3==frame[]:
+                        return
+    return
+"""
+#seq='TGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
+#flag = isGene3(seq) # True
+#print flag
+
+
+
+
+
+#Functions used to invert the dna strand.
+def brincomp(seq):
+    comp = ""
+    for i in range(len(seq)):
+        if seq[i] == "A":
+            comp = comp + "T"
+        if seq[i] == "C":
+            comp = comp + "G"
+        if seq[i] == "G":
+            comp = comp + "C"
+        if seq[i] == "T":
+            comp = comp + "A"
+    return comp
+
+
+def invert(seq):
+    #comp = brincomp (seq)
+    #print comp
+    reverse=seq[::-1]
+    return reverse
+
+def brinAntiSens(seq):
+    brinSens=seq
+    inverseBrinSens=invert(brinSens)
+    complementaire=brincomp(inverseBrinSens)
+    return complementaire
+
+    #end of reverse Functions.
+
+    """
+    END of myBio library
+    """
+
 
 def loadFASTA(nomFichier):
     rawFASTA=""
@@ -59,10 +214,10 @@ def translate(seq,codetable) :
     Returns : The proteic sequence as a string.
     """
     seqprot=""
-    flag=bio.isDNA(seq)
+    flag=isDNA(seq)
     if flag==True:
         for i in range(0,len(seq),3):
-            codon=bio.oneWord(seq,i,3)
+            codon=oneWord(seq,i,3)
             for tablecodon in codetable.keys():
                 if codon==tablecodon:
                     seqprot=seqprot+codetable[tablecodon][0]
@@ -158,7 +313,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
     #print len(seq)
     for i in range(len(seq)):
         print i
-        strt=bio.isCodonStart(seq,i,codetable)
+        strt=isCodonStart(seq,i,codetable)
         if strt==True:
             frame=(i%3)+1
             if sens == 1:
@@ -170,7 +325,7 @@ def findORF (seq,threshold,codetable,orflist,sens):
             #StartTable[i]=frame
             print "Cadre: ",frame," , "," Position codon start: ",i
 
-        stp=bio.isCodonStop(seq,i,codetable)
+        stp=isCodonStop(seq,i,codetable)
         if stp==True:
             frame=(i%3)+1
             if sens == 1:
@@ -327,77 +482,6 @@ def compare(listORFs1,listORFs2):
 
 
 
-def writeCSV(filename, separator, data):
-    '''Marc MONGY'''
-    '''Cette fonction utilise une serie de fonctions de manipulation de listes,
-    de chaines de caracteres et de dictionnaires pour convertir l'ORF (sous forme de dictionnaire Python)
-    et l'enregistrer sous un format de fichier CSV.
-    Le parametre "separator" represente le separateur utilise (ici, le point-virgule)
-    '''
-    for i in range(len(data)):
-        keys=list(data.keys())
-        values=list(data.values())
-        result=readCSV(filename, separator)
-        with open ("my_data.csv", "w") as my_data:
-            separator=str(separator)
-            keys=str(keys)
-            keys=keys.replace(",", separator)
-            keys=keys.replace("'", "")
-            keys=keys.replace(" ","")
-            keys=keys.replace("[","")
-            keys=keys.replace("]","")
-            values=str(values)
-            values=values.replace(',', separator)
-            values=values.replace(" ","")
-            values=values.replace("[","")
-            values=values.replace("]","")
-            error=my_data.write(keys)
-            error=my_data.write(str('\n'))
-            error=my_data.write(values)
-            my_data.close()
-        return error
-
-
-
-def readCSV(filename, separator):
-    """Marc MONGY"""
-    """Cette fonction effectue la conversion du format CSV vers un dictionnaire (operation inverse de writeCSV)
-    afin de permettre l'utilisation de l'ORF sous forme de dictionnaire Python par d'autres scripts.
-    """
-    with open ("my_data.csv", "r") as my_data:
-        result=my_data.read()
-        separator=str(separator)
-        result=result.replace("'","")
-        result=result.replace(separator, "', '")
-        result="['" + result + "']"
-        result=result.replace("\n", "']\n['")
-        result=result.split('\n')
-        result[0]=result[0].replace("'", "")
-        result[0]=result[0].replace("[", "")
-        result[0]=result[0].replace("]", "")
-        result[0]=result[0].replace(" ","")
-        result[0]=result[0].split(',')
-        keys=result[0]
-        result[1]=result[1].replace("'", "")
-        result[1]=result[1].replace("[", "")
-        result[1]=result[1].replace("]", "")
-        result[1]=result[1].replace(" ","")
-        result[1]=result[1].split(',')
-        values=result[1]
-        result={key:value for key, value in zip(keys,values)}
-        result['id']=int(result['id'])
-        result['start']=int(result['start'])
-        result['stop']=int(result['stop'])
-        result['name']=str(result['name'])
-        my_data.close()
-    return result
-
-
-
-
-
-
-
 #Begin
 
 orflist=[]
@@ -411,9 +495,9 @@ print len(seq)
 
 #seq='CTGATGTTCCATTACCAGTACAACAAACTATGATTCCATTACCAGTACA'
 
-invert_seq=bio.brinAntiSens(seq)
+invert_seq=brinAntiSens(seq)
 
-CodeTable=bio.getGeneticCode(4)
+CodeTable=getGeneticCode(4)
 
 threshold=1000
 
