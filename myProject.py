@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 
 import myBio as bio
 
@@ -333,27 +334,28 @@ def writeCSV(filename, separator, data):
     et l'enregistrer sous un format de fichier CSV.
     Le parametre "separator" represente le separateur utilise (ici, le point-virgule)
     '''
-    keys=list(data.keys())
-    values=list(data.values())
-    result=readCSV(filename, separator)
-    with open ("my_data.csv", "w") as my_data:
-        separator=str(separator)
-        keys=str(keys)
-        keys=keys.replace(",", separator)
-        keys=keys.replace("'", "")
-        keys=keys.replace(" ","")
-        keys=keys.replace("[","")
-        keys=keys.replace("]","")
-        values=str(values)
-        values=values.replace(',', separator)
-        values=values.replace(" ","")
-        values=values.replace("[","")
-        values=values.replace("]","")
-        error=my_data.write(keys)
-        error=my_data.write(str('\n'))
-        error=my_data.write(values)
-        my_data.close()
-    return error
+    for i in range(len(data)):
+        keys=list(data.keys())
+        values=list(data.values())
+        result=readCSV(filename, separator)
+        with open ("my_data.csv", "w") as my_data:
+            separator=str(separator)
+            keys=str(keys)
+            keys=keys.replace(",", separator)
+            keys=keys.replace("'", "")
+            keys=keys.replace(" ","")
+            keys=keys.replace("[","")
+            keys=keys.replace("]","")
+            values=str(values)
+            values=values.replace(',', separator)
+            values=values.replace(" ","")
+            values=values.replace("[","")
+            values=values.replace("]","")
+            error=my_data.write(keys)
+            error=my_data.write(str('\n'))
+            error=my_data.write(values)
+            my_data.close()
+        return error
 
 
 
@@ -394,48 +396,8 @@ def readCSV(filename, separator):
 
 
 
-def menu():
-    orflist=[]
-    print "liste OK"
-    rawFASTA=loadFASTA("SeqTestXV.fasta")
-    #seq=readFASTA(rawFASTA)
-    seq2=readFASTA(rawFASTA)
-
-    seq=seq2[0:50000]
-    print "___________________________________________"
-    print "1 : Recherche des ORF"
-    print "2 : sorir du programme"
-    print "___________________________________________"
-    #try:
-        #choix = input("entez votre choix : ")
-
-    #except :
-    #boolean=True
-    choix = input ("entez votre choix : ")
-    #while boolean == True :
-        #menu()
-    if choix == 1 :
-        invert_seq=bio.brinAntiSens(seq)
-        CodeTable=bio.getGeneticCode(4)
-        threshold=600
-        findORF(seq, threshold, CodeTable, orflist, 0)
-        findORF(invert_seq, threshold, CodeTable, orflist, 1)
-        ORFs_FINAL_List=ORFtableToDict(orflist)
-        for i in range (len(ORFs_FINAL_List)):
-            print ORFs_FINAL_List[i]
-            print len(ORFs_FINAL_List)
-    if choix == 2 :
-        sys.exit
 
 
-
-##############################################################
-#Begin
-orflist=[]
-menu()
-
-
-"""
 #Begin
 
 orflist=[]
@@ -453,7 +415,7 @@ invert_seq=bio.brinAntiSens(seq)
 
 CodeTable=bio.getGeneticCode(4)
 
-threshold=210
+threshold=1000
 
 findORF(seq, threshold, CodeTable, orflist, 0)
 
@@ -468,14 +430,13 @@ for i in range (len(ORFs_FINAL_List)):
 
 
 
-print len(ORFs_FINAL_List)
+print "Nombre d'ORFs", len(ORFs_FINAL_List)
 
 orf_length=getLengths(ORFs_FINAL_List)
 #print orf_length
 
-print getLongestORF(orf_length)
+print "ORF le plus long", getLongestORF(orf_length)
 
 
 
-print getTopLongestORF(orf_length,0.1)
-"""
+print "Les longueurs des ", (len(ORFs_FINAL_List)*0.1), "ORFs les plus longs :", getTopLongestORF(orf_length,0.1)
